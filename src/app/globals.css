@@ -1,26 +1,240 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Lumen design tokens
+   Colours are authored in OKLCH so lightness ramps stay perceptually even when
+   the palette is re-tinted. Every value below is referenced through a semantic
+   alias so the surface layer never hard-codes a raw colour.
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* raw palette */
+  --color-bone-50: oklch(0.99 0.006 85);
+  --color-bone-100: oklch(0.975 0.009 84);
+  --color-bone-200: oklch(0.945 0.013 82);
+  --color-bone-300: oklch(0.9 0.018 80);
+
+  --color-ink-900: oklch(0.18 0.012 60);
+  --color-ink-800: oklch(0.24 0.015 62);
+  --color-ink-700: oklch(0.34 0.016 64);
+  --color-ink-500: oklch(0.52 0.014 66);
+  --color-ink-400: oklch(0.64 0.012 68);
+
+  --color-sage-200: oklch(0.91 0.03 158);
+  --color-sage-400: oklch(0.78 0.055 156);
+  --color-sage-600: oklch(0.62 0.068 155);
+  --color-sage-800: oklch(0.42 0.055 154);
+
+  --color-clay-200: oklch(0.92 0.035 62);
+  --color-clay-400: oklch(0.82 0.075 60);
+  --color-clay-600: oklch(0.68 0.095 55);
+
+  --color-blush-200: oklch(0.93 0.03 22);
+  --color-blush-400: oklch(0.84 0.055 20);
+
+  /* typography */
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --text-hero: clamp(2.75rem, 9vw, 8.5rem);
+  --text-display: clamp(2rem, 5.5vw, 4.5rem);
+  --text-title: clamp(1.5rem, 3vw, 2.5rem);
+  --text-eyebrow: 0.6875rem;
+
+  /* motion — one shared vocabulary so nothing animates off-system */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast: 220ms;
+  --duration-base: 420ms;
+  --duration-slow: 780ms;
+
+  /* structure */
+  --radius-card: 1.25rem;
+  --radius-pill: 999px;
+  --shell-max: 88rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* --------------------------------------------------------------------------
+   Semantic aliases — light is the default, dark overrides only these.
+-------------------------------------------------------------------------- */
+
+:root {
+  --surface: var(--color-bone-50);
+  --surface-raised: oklch(1 0 0);
+  --surface-sunken: var(--color-bone-200);
+  --surface-inverse: var(--color-ink-900);
+
+  --content: var(--color-ink-900);
+  --content-muted: var(--color-ink-500);
+  --content-subtle: var(--color-ink-400);
+  --content-inverse: var(--color-bone-50);
+
+  --accent: var(--color-sage-600);
+  --accent-soft: var(--color-sage-200);
+  --accent-contrast: var(--color-bone-50);
+
+  --hairline: oklch(0.18 0.012 60 / 0.12);
+  --hairline-strong: oklch(0.18 0.012 60 / 0.24);
+
+  --shadow-lift: 0 1px 2px oklch(0.18 0.012 60 / 0.04),
+    0 12px 32px -12px oklch(0.18 0.012 60 / 0.16);
+  --shadow-float: 0 2px 4px oklch(0.18 0.012 60 / 0.05),
+    0 32px 64px -24px oklch(0.18 0.012 60 / 0.28);
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --surface: oklch(0.16 0.012 62);
+  --surface-raised: oklch(0.21 0.014 62);
+  --surface-sunken: oklch(0.12 0.01 62);
+  --surface-inverse: var(--color-bone-50);
+
+  --content: var(--color-bone-100);
+  --content-muted: oklch(0.72 0.012 70);
+  --content-subtle: oklch(0.58 0.012 70);
+  --content-inverse: var(--color-ink-900);
+
+  --accent: var(--color-sage-400);
+  --accent-soft: oklch(0.32 0.045 155);
+  --accent-contrast: var(--color-ink-900);
+
+  --hairline: oklch(0.99 0.006 85 / 0.12);
+  --hairline-strong: oklch(0.99 0.006 85 / 0.24);
+
+  --shadow-lift: 0 1px 2px oklch(0 0 0 / 0.3), 0 12px 32px -12px oklch(0 0 0 / 0.6);
+  --shadow-float: 0 2px 4px oklch(0 0 0 / 0.35), 0 32px 64px -24px oklch(0 0 0 / 0.7);
+
+  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --surface: oklch(0.16 0.012 62);
+    --surface-raised: oklch(0.21 0.014 62);
+    --surface-sunken: oklch(0.12 0.01 62);
+    --surface-inverse: var(--color-bone-50);
+
+    --content: var(--color-bone-100);
+    --content-muted: oklch(0.72 0.012 70);
+    --content-subtle: oklch(0.58 0.012 70);
+    --content-inverse: var(--color-ink-900);
+
+    --accent: var(--color-sage-400);
+    --accent-soft: oklch(0.32 0.045 155);
+    --accent-contrast: var(--color-ink-900);
+
+    --hairline: oklch(0.99 0.006 85 / 0.12);
+    --hairline-strong: oklch(0.99 0.006 85 / 0.24);
+
+    --shadow-lift: 0 1px 2px oklch(0 0 0 / 0.3), 0 12px 32px -12px oklch(0 0 0 / 0.6);
+    --shadow-float: 0 2px 4px oklch(0 0 0 / 0.35),
+      0 32px 64px -24px oklch(0 0 0 / 0.7);
+
+    color-scheme: dark;
   }
 }
 
+/* Expose the semantic aliases to Tailwind's utility generator. */
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-content: var(--content);
+  --color-content-muted: var(--content-muted);
+  --color-content-subtle: var(--content-subtle);
+  --color-content-inverse: var(--content-inverse);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+}
+
+/* -------------------------------------------------------------------------- */
+
+* {
+  border-color: var(--hairline);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--surface);
+  color: var(--content);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: var(--accent-soft);
+  color: var(--content);
+}
+
+/* Keyboard focus only — pointer interaction stays clean. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Lenis drives scroll position; these are the hooks it expects. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion: collapse every transition rather than removing the feature.
+   Content still reveals — it just arrives without travel.
+-------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@utility shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--shell-max);
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  @utility shell {
+    padding-inline: 2.5rem;
+  }
+}
+
+@utility eyebrow {
+  font-size: var(--text-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--content-muted);
+}
+
+/* Grain overlay — keeps large flat cream fields from banding. */
+@utility grain {
+  position: relative;
+  isolation: isolate;
 }
