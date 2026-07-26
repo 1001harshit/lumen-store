@@ -216,11 +216,10 @@ html.lenis body {
   margin-inline: auto;
   width: 100%;
   max-width: var(--shell-max);
+  /* 1.25rem is the floor that satisfies the 16px minimum side gutter. */
   padding-inline: 1.25rem;
-}
 
-@media (min-width: 768px) {
-  @utility shell {
+  @media (width >= 768px) {
     padding-inline: 2.5rem;
   }
 }
@@ -231,10 +230,4 @@ html.lenis body {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--content-muted);
-}
-
-/* Grain overlay — keeps large flat cream fields from banding. */
-@utility grain {
-  position: relative;
-  isolation: isolate;
 }
