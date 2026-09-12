@@ -1,12 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
-import { CartUIProvider } from "@/components/providers/CartUIProvider";
+import { CartProvider } from "@/components/providers/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
-import { CartContents } from "@/components/cart/CartContents";
 import { Header, type NavLink } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
-import { resolveCart } from "@/lib/cart";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -34,8 +32,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Lumen",
     title: "Lumen — Skincare formulated in the open",
-    description:
-      "Actives at concentrations that have actually been trialled.",
+    description: "Actives at concentrations that have actually been trialled.",
   },
 };
 
@@ -61,20 +58,25 @@ const THEME_BOOT = `
 (function(){try{var t=localStorage.getItem('lumen-theme');if(t){document.documentElement.dataset.theme=t;}}catch(e){}})();
 `;
 
-export default async function RootLayout({
+/**
+ * Root layout reads no cookies on purpose.
+ *
+ * The moment it does, every page under it becomes dynamic — including product
+ * and collection pages whose markup is identical for every visitor. The cart
+ * hydrates client-side instead, so the catalog keeps static rendering.
+ */
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cart = await resolveCart();
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
       <body className={`${fraunces.variable} ${inter.variable} antialiased`}>
-        <CartUIProvider>
+        <CartProvider>
           <SmoothScroll />
 
           <a
@@ -84,16 +86,14 @@ export default async function RootLayout({
             Skip to content
           </a>
 
-          <Header links={NAV} itemCount={cart.itemCount} />
+          <Header links={NAV} />
 
           <main id="main">{children}</main>
 
           <Footer />
 
-          <CartDrawer>
-            <CartContents />
-          </CartDrawer>
-        </CartUIProvider>
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );

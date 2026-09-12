@@ -6,21 +6,17 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import { Menu, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/providers/ThemeToggle";
-import { useCartUI } from "@/components/providers/CartUIProvider";
+import { useCart } from "@/components/providers/CartProvider";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { cn } from "@/lib/utils";
 
 export type NavLink = { href: string; label: string };
 
-type HeaderProps = {
-  links: NavLink[];
-  itemCount: number;
-};
-
-export function Header({ links, itemCount }: HeaderProps) {
+export function Header({ links }: { links: NavLink[] }) {
   const { scrollY } = useScroll();
   const pathname = usePathname();
-  const { openCart } = useCartUI();
+  const { openCart, cart } = useCart();
+  const itemCount = cart.itemCount;
 
   const [hidden, setHidden] = useState(false);
   const [condensed, setCondensed] = useState(false);

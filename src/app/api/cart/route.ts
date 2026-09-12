@@ -24,6 +24,9 @@ export async function GET() {
         productId: line.product.id,
         slug: line.product.slug,
         name: line.product.name,
+        // Ships with the line so the drawer can draw the thumbnail without
+        // pulling the whole catalog into the client bundle.
+        art: line.product.art,
         variantId: line.variant.id,
         sku: line.variant.sku,
         options: line.variant.options,

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Check, Loader2 } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import { addToCart } from "@/app/actions/cart";
-import { useCartUI } from "@/components/providers/CartUIProvider";
+import { useCart } from "@/components/providers/CartProvider";
 import {
   defaultSelection,
   findVariant,
@@ -34,7 +34,7 @@ export function BuyPanel({ product }: { product: Product }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
-  const { openCart } = useCartUI();
+  const { openCart, refresh } = useCart();
 
   const variant = useMemo(
     () => findVariant(product, selection),
@@ -56,6 +56,9 @@ export function BuyPanel({ product }: { product: Product }) {
         setStatus("idle");
         return;
       }
+      // Re-read the authoritative cart before revealing the drawer, so it
+      // never opens showing the pre-add state for a frame.
+      await refresh();
       setStatus("added");
       openCart();
       // Revert the confirmation state so a second purchase reads as a new
