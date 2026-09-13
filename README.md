@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lumen
 
-## Getting Started
+A skincare storefront built as one Next.js app — full front end, light back end,
+no database to provision.
 
-First, run the development server:
+**Live:** https://lumen-store.vercel.app
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+![Next.js](https://img.shields.io/badge/Next.js-16-000?logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19-087ea4?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-06b6d4?logo=tailwindcss&logoColor=white)
+
+---
+
+## What this is
+
+A complete commerce front end — catalog, product pages with multi-attribute
+variants, a cart, and a three-step checkout — running on a backend that is
+nothing more than Next.js route handlers and server actions over an in-repo
+catalog.
+
+That constraint is the point. A headless storefront usually means standing up a
+separate commerce API (Postgres, Redis, a worker queue) before a single pixel
+renders. Everything here deploys as one app to one platform with no
+infrastructure behind it, while keeping the parts that actually matter for
+correctness: server-side pricing, stock validation, and a cart the client
+cannot forge.
+
+## Architecture
+
+```
+Browser                     Next.js (single deploy)
+───────                     ───────────────────────
+
+  Catalog pages   ◀─────    Statically prerendered at build
+  (home, PDPs)              12 PDPs via generateStaticParams
+
+  Cart drawer     ◀────▶    GET /api/cart          (no-store, per-visitor)
+                            server actions          (validate → write cookie)
+
+  Checkout        ◀────▶    Server-resolved cart, recomputed totals
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Display cached, cart live.** The root layout deliberately reads no cookies.
+The moment it does, every page beneath it turns dynamic — including product
+pages whose markup is identical for every visitor. So the catalog prerenders and
+ships from the CDN, and the cart hydrates over the top from a `no-store`
+endpoint.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**The cart cookie holds references only** — product id, variant id, quantity.
+Prices are resolved against the catalog server-side on every request and are
+never written to or read from the client. A cookie is user-editable; anything
+trusted that lives in one is a pricing exploit waiting to happen. The worst a
+tampered cookie can do here is name a product that does not exist, which the
+resolver drops.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Money is integer paise end to end.** `formatMoney` is the only place it
+becomes rupees, so no subtotal can pick up float drift.
 
-## Learn More
+## Motion
 
-To learn more about Next.js, take a look at the following resources:
+Six primitives under `src/components/motion/`, all composed from one shared
+vocabulary of easings and durations in `globals.css`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Primitive | What it does |
+|---|---|
+| `Reveal` / `RevealGroup` | Scroll-triggered entrances, fires once, named variants for staggered grids |
+| `TextReveal` | Display type lifting out from behind a per-word mask |
+| `SmoothScroll` | Lenis inertial scrolling, with anchor handling routed through it |
+| `Magnetic` | Pointer-follow, clamped and gated to fine pointers |
+| `Parallax` / `ScrollScale` | Per-element scroll progress, spring-smoothed |
+| `Marquee` | Seamless ticker — duplicated track translated exactly -50% |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Reduced motion is handled per primitive, not globally.** Each one degrades to
+something that still communicates: `Reveal` fades without travel, `Marquee`
+becomes a static scrollable row, `SmoothScroll` returns the browser's native
+scroll rather than a faster smoothed one. The content never disappears because
+someone asked for less movement.
 
-## Deploy on Vercel
+## Product imagery
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Every product shot is generated SVG, drawn from two OKLCH hue angles and a
+vessel silhouette in `ProductRender`. No photography, no image pipeline, no
+CDN — a few hundred inline bytes that scale to any viewport, re-tint per
+product, and inherit the theme, so a dark-mode product shot is genuinely dark
+rather than a white JPEG punched into a dark page.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Running it
+
+```bash
+npm install
+npm run dev          # http://localhost:3000
+```
+
+```bash
+npm run build && npm start
+```
+
+No environment variables are required. Node 20+.
+
+## API
+
+Read-only, sharing the same sort and filter helpers the pages use, so the API
+cannot disagree with the UI about ordering.
+
+```
+GET /api/products?collection=treat&sort=price-asc&limit=4
+GET /api/products/:slug
+GET /api/collections
+GET /api/cart
+```
+
+Writes are deliberately absent. Mutations go through server actions so they
+revalidate the rendered tree, which a fetch to a route handler would not.
+
+## Layout
+
+```
+src/
+├── app/
+│   ├── actions/              server actions — the write half of the backend
+│   ├── api/                  read-only JSON endpoints
+│   ├── products/[slug]/      PDP, prerendered per product
+│   ├── collections/[slug]/   collection listings
+│   ├── checkout/             three-step, step held in ?step=
+│   └── order/[id]/           confirmation
+├── components/
+│   ├── motion/               the six primitives above
+│   ├── product/              renders, cards, gallery, buy panel
+│   ├── cart/                 drawer, lines, shipping meter
+│   ├── sections/             home page composition
+│   └── ui/                   button, skeletons
+├── data/                     the catalog — swap this for a CMS
+└── lib/                      catalog reads, cart, variants, sorting, orders
+```
+
+`lib/catalog.ts` is the only module that reads `data/`, so pointing this at a
+real commerce API is a one-file change.
+
+## Known limits
+
+This is a portfolio build, and a few things are demo-grade on purpose:
+
+- **Orders are stored in a cookie**, not a database. An order is a financial
+  record — it has to outlive the browser that created it and cannot live
+  anywhere the customer can edit. `lib/orders.ts` is the one file that would
+  need to become a table write.
+- **No payment gateway.** Checkout confirms an order and charges nothing.
+- **No auth**, so no accounts or order history.
+- **Stock is static** and never decrements.
+
+## Licence
+
+MIT.
