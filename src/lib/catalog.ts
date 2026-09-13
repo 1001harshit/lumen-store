@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { PRODUCTS } from "@/data/products";
 import { COLLECTIONS, COLLECTION_BY_SLUG } from "@/data/collections";
-import type { CollectionSlug, Product, Variant } from "@/lib/types";
+import type { CollectionSlug, Product } from "@/lib/types";
 
 /**
  * Read layer over the catalog.

@@ -19,13 +19,7 @@ import type { Product } from "@/lib/types";
  * inside are decorative so screen readers announce one target rather than
  * three nested ones.
  */
-export function ProductCard({
-  product,
-  priority = false,
-}: {
-  product: Product;
-  priority?: boolean;
-}) {
+export function ProductCard({ product }: { product: Product }) {
   const [hovered, setHovered] = useState(false);
 
   const prices = product.variants.map((v) => v.price);

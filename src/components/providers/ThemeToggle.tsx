@@ -2,32 +2,57 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark";
 
 /**
  * Explicit theme switch layered over the system preference.
  *
- * The stylesheet already handles system dark via prefers-color-scheme; this
- * only ever stamps data-theme on <html> to override it. `theme` starts as null
- * so the first paint matches whatever the inline boot script decided, rather
- * than flashing the wrong icon for a frame.
+ * The theme is not React state — it lives on `<html data-theme>`, which the
+ * boot script stamps before first paint and the stylesheet reads. That makes
+ * the DOM the external store, so this subscribes to it with
+ * useSyncExternalStore rather than mirroring it into local state from an
+ * effect. Two practical consequences: the icon can never drift out of sync
+ * with the palette actually on screen, and it still updates correctly if the
+ * OS preference changes while the page is open.
  */
-export function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<Theme | null>(null);
+function subscribe(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
 
-  useEffect(() => {
-    const stamped = document.documentElement.dataset.theme as Theme | undefined;
-    if (stamped) return setTheme(stamped);
-    setTheme(
-      window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
-    );
-  }, []);
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  media.addEventListener("change", onChange);
+
+  return () => {
+    observer.disconnect();
+    media.removeEventListener("change", onChange);
+  };
+}
+
+function getSnapshot(): Theme {
+  const stamped = document.documentElement.dataset.theme as Theme | undefined;
+  if (stamped) return stamped;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+/** The server cannot know the preference; light matches the default palette. */
+function getServerSnapshot(): Theme {
+  return "light";
+}
+
+export function ThemeToggle({ className }: { className?: string }) {
+  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const toggle = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
-    setTheme(next);
+    // Writing the attribute is the state update — the subscription above picks
+    // it up and re-renders this button.
     document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem("lumen-theme", next);
@@ -45,7 +70,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
-          key={theme ?? "pending"}
+          key={theme}
           initial={{ opacity: 0, rotate: -75, scale: 0.6 }}
           animate={{ opacity: 1, rotate: 0, scale: 1 }}
           exit={{ opacity: 0, rotate: 75, scale: 0.6 }}

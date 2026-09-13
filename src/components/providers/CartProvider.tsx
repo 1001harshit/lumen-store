@@ -86,9 +86,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Initial read. The fetch is inlined rather than calling refresh() so that
+  // every setState happens inside a promise callback — an effect body that
+  // synchronously kicks off state updates causes cascading renders. The
+  // AbortController also stops a slow response from landing after unmount.
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    const controller = new AbortController();
+
+    fetch("/api/cart", { cache: "no-store", signal: controller.signal })
+      .then((response) =>
+        response.ok
+          ? (response.json() as Promise<ClientCart>)
+          : Promise.reject(new Error(`cart ${response.status}`)),
+      )
+      .then((data) => setCart(data))
+      .catch(() => {
+        // Offline or aborted: keep whatever is on screen rather than blanking
+        // a cart the shopper has already filled.
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, []);
 
   const openCart = useCallback(() => setOpen(true), []);
   const closeCart = useCallback(() => setOpen(false), []);
