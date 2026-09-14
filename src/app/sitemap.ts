@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllProducts, getCollections } from "@/lib/catalog";
-
-const BASE = "https://lumen-store.vercel.app";
+import { SITE_URL as BASE } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, collections] = await Promise.all([

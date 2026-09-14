@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { absoluteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
       // Cart-bearing and per-order pages carry state, not content.
       disallow: ["/checkout", "/order/", "/api/"],
     },
-    sitemap: "https://lumen-store.vercel.app/sitemap.xml",
+    sitemap: absoluteUrl("/sitemap.xml"),
   };
 }

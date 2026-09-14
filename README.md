@@ -3,7 +3,7 @@
 A skincare storefront built as one Next.js app — full front end, light back end,
 no database to provision.
 
-**Live:** https://lumen-store.vercel.app
+> Not deployed yet. Run it locally with the steps below.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-000?logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-087ea4?logo=react&logoColor=white)
@@ -96,7 +96,17 @@ npm run dev          # http://localhost:3000
 npm run build && npm start
 ```
 
-No environment variables are required. Node 20+.
+No environment variables are required to run it. Node 20+.
+
+One optional variable matters for deployment:
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Canonical origin used by `metadataBase`, `sitemap.xml` and `robots.txt`. Set it to your custom domain. |
+
+Left unset, the site URL is derived from Vercel's `VERCEL_PROJECT_PRODUCTION_URL`
+at build time, falling back to `http://localhost:3000`. No domain is hardcoded
+anywhere in the source — see `src/lib/site.ts`.
 
 ## API
 

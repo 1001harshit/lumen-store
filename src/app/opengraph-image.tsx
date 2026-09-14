@@ -73,7 +73,7 @@ export default async function OpengraphImage() {
             Twelve products · No ten-step routine
           </div>
           <div style={{ display: "flex", color: "#5a7d68" }}>
-            lumen-store.vercel.app
+            Formulated in Bengaluru
           </div>
         </div>
       </div>

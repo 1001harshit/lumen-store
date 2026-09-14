@@ -5,6 +5,7 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Header, type NavLink } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -21,7 +22,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lumen-store.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Lumen — Skincare formulated in the open",
     template: "%s · Lumen",
