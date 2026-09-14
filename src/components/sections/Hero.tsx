@@ -65,16 +65,18 @@ export function Hero({ products }: { products: Product[] }) {
         className="pointer-events-none absolute inset-0 -z-[5]"
       >
         {products.slice(0, 4).map((product, i) => {
+          // Kept inside the outer thirds so nothing crosses the centre
+          // column where the headline, copy and stats sit.
           const spots = [
-            "left-[-2%] top-[10%] h-56 w-44 md:h-[26rem] md:w-80",
-            "right-[-1%] top-[20%] h-52 w-40 md:h-96 md:w-72",
-            "left-[11%] bottom-[2%] h-44 w-36 md:h-80 md:w-64",
-            "right-[13%] bottom-[-2%] hidden h-40 w-32 md:block md:h-72 md:w-56",
+            "left-[2%] top-[15%] h-36 w-28 md:h-64 md:w-48",
+            "right-[2%] top-[19%] h-32 w-24 md:h-60 md:w-44",
+            "left-[7%] bottom-[12%] hidden h-28 w-20 sm:block md:h-48 md:w-36",
+            "right-[7%] bottom-[10%] hidden h-28 w-20 sm:block md:h-48 md:w-36",
           ];
           return (
             <motion.div
               key={product.id}
-              className={`absolute ${spots[i]} overflow-hidden rounded-[2rem] opacity-80 md:opacity-100`}
+              className={`absolute ${spots[i]} overflow-hidden rounded-3xl opacity-55 shadow-[var(--shadow-lift)] md:opacity-85`}
               initial={{ opacity: 0, y: 40, rotate: i % 2 === 1 ? 6 : -5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -107,7 +109,7 @@ export function Hero({ products }: { products: Product[] }) {
         className="shell relative z-10"
       >
         <motion.p
-          className="eyebrow"
+          className="eyebrow text-center"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
@@ -118,7 +120,7 @@ export function Hero({ products }: { products: Product[] }) {
         <TextReveal
           as="h1"
           text="Skincare with the percentages on the front."
-          className="mx-auto mt-5 max-w-[16ch] text-center font-display text-hero leading-[0.9] tracking-[-0.045em]"
+          className="mx-auto mt-6 max-w-[18ch] text-center font-display text-hero leading-[0.94] tracking-[-0.04em]"
           delay={0.2}
         />
 
@@ -154,7 +156,7 @@ export function Hero({ products }: { products: Product[] }) {
       {/* Proof strip — fills the lower third, which otherwise reads as a gap
           between the call to action and the fold. */}
       <motion.dl
-        className="absolute inset-x-0 bottom-20 z-10 hidden justify-center gap-12 md:flex lg:gap-20"
+        className="absolute inset-x-0 bottom-16 z-10 mx-auto grid w-full max-w-md grid-cols-4 gap-2 px-5 md:bottom-20 md:flex md:max-w-none md:justify-center md:gap-12 lg:gap-20"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.05, ease: [0.16, 1, 0.3, 1] }}
@@ -166,10 +168,12 @@ export function Hero({ products }: { products: Product[] }) {
           { value: "24h", label: "Dispatch" },
         ].map((stat) => (
           <div key={stat.label} className="text-center">
-            <dt className="font-display text-3xl tabular-nums tracking-[-0.03em]">
+            <dt className="font-display text-xl tabular-nums tracking-[-0.03em] md:text-3xl">
               {stat.value}
             </dt>
-            <dd className="eyebrow mt-1.5">{stat.label}</dd>
+            <dd className="eyebrow mt-1 text-[0.55rem] leading-tight md:mt-1.5 md:text-[0.6875rem]">
+              {stat.label}
+            </dd>
           </div>
         ))}
       </motion.dl>

@@ -81,9 +81,14 @@ someone asked for less movement.
 
 Every product shot is generated SVG, drawn from two OKLCH hue angles and a
 vessel silhouette in `ProductRender`. No photography, no image pipeline, no
-CDN — a few hundred inline bytes that scale to any viewport, re-tint per
-product, and inherit the theme, so a dark-mode product shot is genuinely dark
-rather than a white JPEG punched into a dark page.
+CDN — a few hundred inline bytes that scale to any viewport and re-tint per
+product from two numbers.
+
+The renders keep a light ground in both themes: against dark chrome they read
+as lit product tiles in a gallery, which is the intended look. Hue midpoints
+are interpolated the short way around the wheel — a naive `(a + b) / 2` puts
+Retinal's 28°→352° pair at 190°, painting a teal band through a maroon
+bottle.
 
 ## Running it
 

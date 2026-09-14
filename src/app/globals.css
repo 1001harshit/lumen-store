@@ -36,8 +36,8 @@
   --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --text-hero: clamp(2.75rem, 9vw, 8.5rem);
-  --text-display: clamp(2rem, 5.5vw, 4.5rem);
+  --text-hero: clamp(2.5rem, 6.4vw, 5.75rem);
+  --text-display: clamp(1.875rem, 4.4vw, 3.75rem);
   --text-title: clamp(1.5rem, 3vw, 2.5rem);
   --text-eyebrow: 0.6875rem;
 

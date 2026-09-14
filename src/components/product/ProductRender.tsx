@@ -16,6 +16,18 @@ import { cn } from "@/lib/utils";
  * what makes a grid of them feel composed rather than sparse.
  */
 
+/**
+ * Midpoint of two hue angles, taking the short way round the wheel.
+ *
+ * A plain (a + b) / 2 breaks whenever a pair straddles 0°: Retinal runs
+ * 28° -> 352°, which are 36° apart, but the naive mean lands on 190° — the
+ * opposite side of the wheel — painting a teal band through a maroon bottle.
+ */
+function midHue(from: number, to: number) {
+  const delta = ((to - from + 540) % 360) - 180;
+  return (from + delta / 2 + 360) % 360;
+}
+
 type Vessel = {
   /** Main silhouette. */
   body: string;
@@ -56,8 +68,8 @@ const VESSELS: Record<Artwork["vessel"], Vessel> = {
     labelW: 104,
   },
   jar: {
-    body: "M74 232 Q74 212 98 212 L302 212 Q326 212 326 232 L326 416 Q326 462 280 462 L120 462 Q74 462 74 416 Z",
-    cap: "M62 108 Q62 92 80 92 L320 92 Q338 92 338 108 L338 192 Q338 212 316 212 L84 212 Q62 212 62 192 Z",
+    body: "M74 214 Q74 196 98 196 L302 196 Q326 196 326 214 L326 416 Q326 462 280 462 L120 462 Q74 462 74 416 Z",
+    cap: "M78 142 Q78 128 96 128 L304 128 Q322 128 322 142 L322 182 Q322 198 302 198 L98 198 Q78 198 78 182 Z",
     label: "M112 268 L288 268 L288 392 L112 392 Z",
     fillY: 264,
     labelX: 140,
@@ -96,6 +108,7 @@ export function ProductRender({
   // rather than the same image re-tinted.
   const from = alternate ? hueTo : hueFrom;
   const to = alternate ? hueFrom : hueTo;
+  const mid = midHue(from, to);
   const lit = alternate ? "right" : "left";
 
   const uid = `${id}${alternate ? "-alt" : ""}`;
@@ -110,7 +123,7 @@ export function ProductRender({
       <defs>
         <linearGradient id={`ground-${uid}`} x1="0" y1="0" x2="0.6" y2="1">
           <stop offset="0%" stopColor={`oklch(0.94 ${chroma * 0.5} ${from})`} />
-          <stop offset="55%" stopColor={`oklch(0.89 ${chroma * 0.62} ${(from + to) / 2})`} />
+          <stop offset="55%" stopColor={`oklch(0.89 ${chroma * 0.62} ${mid})`} />
           <stop offset="100%" stopColor={`oklch(0.82 ${chroma * 0.72} ${to})`} />
         </linearGradient>
 
@@ -126,7 +139,7 @@ export function ProductRender({
 
         <linearGradient id={`body-${uid}`} x1={lit === "left" ? "0" : "1"} y1="0" x2={lit === "left" ? "1" : "0"} y2="0.7">
           <stop offset="0%" stopColor={`oklch(0.88 ${chroma * 0.9} ${from})`} />
-          <stop offset="38%" stopColor={`oklch(0.74 ${chroma * 1.25} ${(from + to) / 2})`} />
+          <stop offset="38%" stopColor={`oklch(0.74 ${chroma * 1.25} ${mid})`} />
           <stop offset="100%" stopColor={`oklch(0.5 ${chroma * 0.95} ${to})`} />
         </linearGradient>
 
@@ -136,9 +149,9 @@ export function ProductRender({
         </linearGradient>
 
         <linearGradient id={`cap-${uid}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor={`oklch(0.34 ${chroma * 0.45} ${to})`} />
-          <stop offset="42%" stopColor={`oklch(0.56 ${chroma * 0.6} ${to})`} />
-          <stop offset="100%" stopColor={`oklch(0.28 ${chroma * 0.4} ${to})`} />
+          <stop offset="0%" stopColor={`oklch(0.46 ${chroma * 0.5} ${to})`} />
+          <stop offset="42%" stopColor={`oklch(0.66 ${chroma * 0.62} ${to})`} />
+          <stop offset="100%" stopColor={`oklch(0.4 ${chroma * 0.45} ${to})`} />
         </linearGradient>
 
         <linearGradient id={`shine-${uid}`} x1="0" y1="0" x2="0" y2="1">
