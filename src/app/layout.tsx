@@ -4,6 +4,7 @@ import { CartProvider } from "@/components/providers/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Header, type NavLink } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { Suspense } from "react";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -78,7 +79,9 @@ export default function RootLayout({
       </head>
       <body className={`${fraunces.variable} ${inter.variable} antialiased`}>
         <CartProvider>
-          <SmoothScroll />
+          <Suspense fallback={null}>
+            <SmoothScroll />
+          </Suspense>
 
           <a
             href="#main"
