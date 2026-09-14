@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
+import { Star } from "lucide-react";
 import { useState } from "react";
 import { ProductRender } from "@/components/product/ProductRender";
 import { formatMoney, cn } from "@/lib/utils";
@@ -37,7 +38,7 @@ export function ProductCard({ product }: { product: Product }) {
       className="group flex flex-col"
       aria-label={`${product.name} — ${product.tagline}, from ${formatMoney(from)}`}
     >
-      <div className="relative aspect-4/5 overflow-hidden rounded-[var(--radius-card)] bg-surface-sunken">
+      <div className="relative aspect-4/5 overflow-hidden rounded-[var(--radius-card)] bg-surface-sunken ring-1 ring-hairline">
         <motion.div
           className="absolute inset-0"
           animate={{ opacity: hovered ? 0 : 1 }}
@@ -100,9 +101,40 @@ export function ProductCard({ product }: { product: Product }) {
           {formatMoney(from)}
         </span>
       </div>
+
       <p className="mt-1 text-[0.8125rem] leading-snug text-content-muted">
         {product.tagline}
       </p>
+
+      <div className="mt-2.5 flex items-center gap-2" aria-hidden>
+        <span className="flex gap-px">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star
+              key={i}
+              size={11}
+              className={
+                i < Math.round(product.rating)
+                  ? "fill-accent text-accent"
+                  : "text-content-subtle/35"
+              }
+            />
+          ))}
+        </span>
+        <span className="text-[0.7rem] tabular-nums text-content-subtle">
+          {product.rating} ({product.reviewCount.toLocaleString("en-IN")})
+        </span>
+      </div>
+
+      <div className="mt-2.5 flex flex-wrap gap-1.5">
+        {product.badges.slice(0, 2).map((badge) => (
+          <span
+            key={badge}
+            className="rounded-full border border-hairline px-2 py-0.5 text-[0.65rem] text-content-muted"
+          >
+            {badge}
+          </span>
+        ))}
+      </div>
     </Link>
   );
 }

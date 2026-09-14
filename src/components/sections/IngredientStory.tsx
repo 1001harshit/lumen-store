@@ -27,7 +27,7 @@ export function IngredientStory({ product }: { product: Product }) {
   const activate = useCallback((index: number) => setActiveIndex(index), []);
 
   return (
-    <section id="ingredients" className="shell mt-32 scroll-mt-28">
+    <section id="ingredients" className="shell mt-24 scroll-mt-28 md:mt-28">
       <div className="grid gap-12 md:grid-cols-2 md:gap-16">
         <div className="hidden md:block">
           <div className="sticky top-28">

@@ -1,4 +1,5 @@
 import { Hero } from "@/components/sections/Hero";
+import { Ticker } from "@/components/sections/Ticker";
 import { SectionHeader } from "@/components/sections/SectionHeader";
 import { CollectionBand } from "@/components/sections/CollectionBand";
 import { IngredientStory } from "@/components/sections/IngredientStory";
@@ -26,17 +27,19 @@ export default async function HomePage() {
     <>
       <Hero products={featured} />
 
-      <section id="featured" className="shell mt-28 scroll-mt-28 md:mt-36">
+      <Ticker />
+
+      <section id="featured" className="shell mt-20 scroll-mt-28 md:mt-24">
         <SectionHeader
           eyebrow="Best sellers"
           title="The four people keep reordering."
           blurb="Nothing here is new. These are the formulas that have survived four years of repeat purchases and the occasional angry email."
           href="/products"
         />
-        <ProductGrid products={featured} className="mt-14" />
+        <ProductGrid products={featured} className="mt-12" />
       </section>
 
-      <section className="shell mt-32">
+      <section className="shell mt-24 md:mt-28">
         <SectionHeader
           eyebrow="The routine"
           title="Four steps, in this order."
@@ -49,20 +52,20 @@ export default async function HomePage() {
 
       {storyProduct && <IngredientStory product={storyProduct} />}
 
-      <section className="shell mt-32">
+      <section className="shell mt-24 md:mt-28">
         <SectionHeader
           eyebrow="Everything"
           title="Twelve products. That is the whole range."
           blurb="No seasonal drops, no limited editions, no variant of a variant. If a formula stops earning its place, it goes."
         />
-        <ProductGrid products={all} className="mt-14" />
+        <ProductGrid products={all} className="mt-12" />
       </section>
 
       <ReviewMarquee />
 
       {/* Closing call to action — full-bleed inverse band so the page ends on
           a hard stop rather than trailing off into the footer. */}
-      <section className="mt-32 bg-surface-inverse py-24 text-content-inverse md:py-32">
+      <section className="mt-24 bg-surface-inverse md:mt-28 py-24 text-content-inverse md:py-32">
         <div className="shell text-center">
           <Reveal>
             <p className="eyebrow text-content-inverse/60">Start simple</p>

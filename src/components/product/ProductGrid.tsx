@@ -14,7 +14,7 @@ export function ProductGrid({
     <RevealGroup
       stagger={0.06}
       className={cn(
-        "grid grid-cols-2 gap-x-5 gap-y-12 lg:grid-cols-3 xl:grid-cols-4",
+        "grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-5 lg:grid-cols-3 xl:grid-cols-4",
         className,
       )}
     >

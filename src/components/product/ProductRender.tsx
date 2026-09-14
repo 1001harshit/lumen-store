@@ -5,46 +5,77 @@ import { cn } from "@/lib/utils";
  * Generated product imagery.
  *
  * Every "photograph" in this store is drawn here from the product's `art`
- * config. That is a deliberate choice over stock photography: the renders are
- * a few hundred bytes of inline SVG, they scale to any viewport without an
- * image pipeline, they re-tint per product from two hue angles, and they
- * inherit the theme — a dark-mode product shot is genuinely dark rather than a
- * white JPEG punched into a dark page.
+ * config — a few hundred bytes of inline SVG that scale to any viewport,
+ * re-tint per product, and inherit the theme, so a dark-mode product shot is
+ * genuinely dark rather than a white JPEG punched into a dark page.
  *
- * Geometry is authored against a 400x500 viewBox.
+ * Geometry is authored against a 400x500 viewBox and deliberately fills it.
+ * An earlier pass had the vessels at ~14% of frame area, which left every card
+ * reading as a mostly-empty panel with a small object adrift in the middle;
+ * these occupy roughly half the frame and sit on a full-bleed ground, which is
+ * what makes a grid of them feel composed rather than sparse.
  */
 
-const VESSELS: Record<Artwork["vessel"], { body: string; cap: string; label: string }> = {
+type Vessel = {
+  /** Main silhouette. */
+  body: string;
+  /** Closure — cap, lid or pump head. */
+  cap: string;
+  /** Label panel on the face of the vessel. */
+  label: string;
+  /** Fill line, drawn clipped inside the body. */
+  fillY: number;
+  /** Horizontal centre of the label, for the printed rules. */
+  labelX: number;
+  labelW: number;
+};
+
+const VESSELS: Record<Artwork["vessel"], Vessel> = {
   dropper: {
-    body: "M150 190 Q150 176 164 176 L236 176 Q250 176 250 190 L250 408 Q250 430 228 430 L172 430 Q150 430 150 408 Z",
-    cap: "M178 96 Q178 88 186 88 L214 88 Q222 88 222 96 L222 168 Q222 176 214 176 L186 176 Q178 176 178 168 Z",
-    label: "M158 262 L242 262 L242 348 L158 348 Z",
+    body: "M112 196 Q112 168 140 162 L260 162 Q288 168 288 196 L288 438 Q288 470 256 470 L144 470 Q112 470 112 438 Z",
+    cap: "M158 34 Q158 24 168 24 L232 24 Q242 24 242 34 L242 132 Q242 142 232 142 L168 142 Q158 142 158 132 Z M148 142 L252 142 L252 166 L148 166 Z",
+    label: "M128 250 L272 250 L272 396 L128 396 Z",
+    fillY: 246,
+    labelX: 148,
+    labelW: 104,
   },
   pump: {
-    body: "M144 196 Q144 180 160 180 L240 180 Q256 180 256 196 L256 412 Q256 432 236 432 L164 432 Q144 432 144 412 Z",
-    cap: "M182 118 L218 118 L218 180 L182 180 Z M164 96 Q164 88 172 88 L228 88 Q236 88 236 96 L236 118 L164 118 Z",
-    label: "M154 258 L246 258 L246 352 L154 352 Z",
+    body: "M104 212 Q104 182 134 176 L266 176 Q296 182 296 212 L296 440 Q296 472 264 472 L136 472 Q104 472 104 440 Z",
+    cap: "M176 96 L224 96 L224 176 L176 176 Z M132 44 Q132 34 142 34 L214 34 Q224 34 224 44 L224 70 L176 70 L176 96 L132 96 Z M132 70 L176 70 L176 96 L132 96 Z",
+    label: "M120 262 L280 262 L280 404 L120 404 Z",
+    fillY: 258,
+    labelX: 142,
+    labelW: 116,
   },
   tube: {
-    body: "M158 168 L242 168 L256 400 Q258 430 228 430 L172 430 Q142 430 144 400 Z",
-    cap: "M172 112 Q172 104 180 104 L220 104 Q228 104 228 112 L228 168 L172 168 Z",
-    label: "M160 240 L240 240 L246 356 L154 356 Z",
+    body: "M118 158 L282 158 L306 424 Q310 470 264 470 L136 470 Q90 470 94 424 Z",
+    cap: "M160 52 Q160 42 170 42 L230 42 Q240 42 240 52 L240 158 L160 158 Z",
+    label: "M128 244 L272 244 L286 404 L114 404 Z",
+    fillY: 240,
+    labelX: 148,
+    labelW: 104,
   },
   jar: {
-    body: "M120 236 Q120 222 136 222 L264 222 Q280 222 280 236 L280 386 Q280 418 248 418 L152 418 Q120 418 120 386 Z",
-    cap: "M110 168 Q110 156 124 156 L276 156 Q290 156 290 168 L290 214 Q290 222 278 222 L122 222 Q110 222 110 214 Z",
-    label: "M140 272 L260 272 L260 344 L140 344 Z",
+    body: "M74 232 Q74 212 98 212 L302 212 Q326 212 326 232 L326 416 Q326 462 280 462 L120 462 Q74 462 74 416 Z",
+    cap: "M62 108 Q62 92 80 92 L320 92 Q338 92 338 108 L338 192 Q338 212 316 212 L84 212 Q62 212 62 192 Z",
+    label: "M112 268 L288 268 L288 392 L112 392 Z",
+    fillY: 264,
+    labelX: 140,
+    labelW: 120,
   },
   bottle: {
-    body: "M140 232 Q140 210 158 198 L172 188 L228 188 L242 198 Q260 210 260 232 L260 404 Q260 430 234 430 L166 430 Q140 430 140 404 Z",
-    cap: "M180 100 Q180 92 188 92 L212 92 Q220 92 220 100 L220 188 L180 188 Z",
-    label: "M150 268 L250 268 L250 352 L150 352 Z",
+    body: "M108 258 Q108 214 140 194 L164 180 L236 180 L260 194 Q292 214 292 258 L292 436 Q292 470 258 470 L142 470 Q108 470 108 436 Z",
+    cap: "M164 36 Q164 26 174 26 L226 26 Q236 26 236 36 L236 96 L164 96 Z M168 96 L232 96 L236 182 L164 182 Z",
+    label: "M124 278 L276 278 L276 404 L124 404 Z",
+    fillY: 274,
+    labelX: 146,
+    labelW: 108,
   },
 };
 
 type ProductRenderProps = {
   art: Artwork;
-  /** Used to key the gradient ids so multiple renders can share a page. */
+  /** Keys the gradient ids so multiple renders can share a page. */
   id: string;
   className?: string;
   /** Second angle of the pair — used for the hover swap on product cards. */
@@ -61,11 +92,11 @@ export function ProductRender({
   const { hueFrom, hueTo, chroma } = art;
 
   // The alternate view rotates the gradient and swings the light to the other
-  // side, which reads as a second photograph of the same object rather than
-  // the same image tinted differently.
+  // side, so the hover swap reads as a second photograph of the same object
+  // rather than the same image re-tinted.
   const from = alternate ? hueTo : hueFrom;
   const to = alternate ? hueFrom : hueTo;
-  const lightX = alternate ? "72%" : "28%";
+  const lit = alternate ? "right" : "left";
 
   const uid = `${id}${alternate ? "-alt" : ""}`;
 
@@ -77,90 +108,156 @@ export function ProductRender({
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id={`body-${uid}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor={`oklch(0.86 ${chroma} ${from})`} />
-          <stop offset="48%" stopColor={`oklch(0.72 ${chroma * 1.15} ${(from + to) / 2})`} />
-          <stop offset="100%" stopColor={`oklch(0.54 ${chroma * 0.9} ${to})`} />
+        <linearGradient id={`ground-${uid}`} x1="0" y1="0" x2="0.6" y2="1">
+          <stop offset="0%" stopColor={`oklch(0.94 ${chroma * 0.5} ${from})`} />
+          <stop offset="55%" stopColor={`oklch(0.89 ${chroma * 0.62} ${(from + to) / 2})`} />
+          <stop offset="100%" stopColor={`oklch(0.82 ${chroma * 0.72} ${to})`} />
+        </linearGradient>
+
+        <radialGradient id={`glow-${uid}`} cx={lit === "left" ? "30%" : "70%"} cy="26%" r="62%">
+          <stop offset="0%" stopColor={`oklch(0.99 ${chroma * 0.3} ${from} / 0.95)`} />
+          <stop offset="100%" stopColor="oklch(0.99 0 0 / 0)" />
+        </radialGradient>
+
+        <radialGradient id={`corner-${uid}`} cx={lit === "left" ? "88%" : "12%"} cy="88%" r="58%">
+          <stop offset="0%" stopColor={`oklch(0.72 ${chroma} ${to} / 0.5)`} />
+          <stop offset="100%" stopColor="oklch(0.72 0 0 / 0)" />
+        </radialGradient>
+
+        <linearGradient id={`body-${uid}`} x1={lit === "left" ? "0" : "1"} y1="0" x2={lit === "left" ? "1" : "0"} y2="0.7">
+          <stop offset="0%" stopColor={`oklch(0.88 ${chroma * 0.9} ${from})`} />
+          <stop offset="38%" stopColor={`oklch(0.74 ${chroma * 1.25} ${(from + to) / 2})`} />
+          <stop offset="100%" stopColor={`oklch(0.5 ${chroma * 0.95} ${to})`} />
+        </linearGradient>
+
+        <linearGradient id={`liquid-${uid}`} x1="0" y1="0" x2="0.3" y2="1">
+          <stop offset="0%" stopColor={`oklch(0.68 ${chroma * 1.5} ${to} / 0.55)`} />
+          <stop offset="100%" stopColor={`oklch(0.45 ${chroma * 1.2} ${to} / 0.72)`} />
         </linearGradient>
 
         <linearGradient id={`cap-${uid}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor={`oklch(0.42 ${chroma * 0.5} ${to})`} />
-          <stop offset="50%" stopColor={`oklch(0.58 ${chroma * 0.6} ${to})`} />
-          <stop offset="100%" stopColor={`oklch(0.34 ${chroma * 0.45} ${to})`} />
+          <stop offset="0%" stopColor={`oklch(0.34 ${chroma * 0.45} ${to})`} />
+          <stop offset="42%" stopColor={`oklch(0.56 ${chroma * 0.6} ${to})`} />
+          <stop offset="100%" stopColor={`oklch(0.28 ${chroma * 0.4} ${to})`} />
         </linearGradient>
 
-        <radialGradient id={`halo-${uid}`} cx="50%" cy="42%" r="58%">
-          <stop offset="0%" stopColor={`oklch(0.9 ${chroma * 0.8} ${from} / 0.85)`} />
-          <stop offset="62%" stopColor={`oklch(0.9 ${chroma * 0.5} ${from} / 0.22)`} />
-          <stop offset="100%" stopColor={`oklch(0.9 0 0 / 0)`} />
-        </radialGradient>
-
         <linearGradient id={`shine-${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(1 0 0 / 0.55)" />
-          <stop offset="100%" stopColor="oklch(1 0 0 / 0.02)" />
+          <stop offset="0%" stopColor="oklch(1 0 0 / 0.72)" />
+          <stop offset="60%" stopColor="oklch(1 0 0 / 0.18)" />
+          <stop offset="100%" stopColor="oklch(1 0 0 / 0)" />
         </linearGradient>
 
         <clipPath id={`clip-${uid}`}>
           <path d={vessel.body} />
         </clipPath>
 
-        <filter id={`soft-${uid}`} x="-40%" y="-40%" width="180%" height="180%">
-          <feGaussianBlur stdDeviation="18" />
+        <filter id={`blur-${uid}`} x="-45%" y="-45%" width="190%" height="190%">
+          <feGaussianBlur stdDeviation="22" />
+        </filter>
+
+        {/* Fine grain — stops the large flat colour fields from banding. */}
+        <filter id={`grain-${uid}`} x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" />
+          <feColorMatrix type="saturate" values="0" />
         </filter>
       </defs>
 
-      {/* Studio backdrop */}
-      <circle cx="200" cy="238" r="168" fill={`url(#halo-${uid})`} />
+      {/* Full-bleed ground — the frame is never empty cream. */}
+      <rect width="400" height="500" fill={`url(#ground-${uid})`} />
+      <rect width="400" height="500" fill={`url(#corner-${uid})`} />
+      <rect width="400" height="500" fill={`url(#glow-${uid})`} />
 
-      {/* Contact shadow — grounds the vessel so it does not float in space */}
+      {/* Horizon, to seat the object in a space rather than on a flat field. */}
       <ellipse
         cx="200"
-        cy="438"
-        rx="92"
-        ry="16"
-        fill={`oklch(0.32 ${chroma * 0.4} ${to} / 0.34)`}
-        filter={`url(#soft-${uid})`}
+        cy="508"
+        rx="230"
+        ry="86"
+        fill={`oklch(0.97 ${chroma * 0.25} ${from} / 0.75)`}
+      />
+
+      <ellipse
+        cx={lit === "left" ? "292" : "108"}
+        cy="452"
+        rx="130"
+        ry="30"
+        fill={`oklch(0.42 ${chroma * 0.7} ${to} / 0.4)`}
+        filter={`url(#blur-${uid})`}
       />
 
       <path d={vessel.cap} fill={`url(#cap-${uid})`} />
       <path d={vessel.body} fill={`url(#body-${uid})`} />
 
-      {/* Specular band, clipped to the silhouette */}
       <g clipPath={`url(#clip-${uid})`}>
+        {/* Contents, with a visible fill line. */}
         <rect
-          x={lightX === "28%" ? "150" : "224"}
-          y="150"
-          width="26"
-          height="300"
-          rx="13"
-          fill={`url(#shine-${uid})`}
+          x="0"
+          y={vessel.fillY}
+          width="400"
+          height={500 - vessel.fillY}
+          fill={`url(#liquid-${uid})`}
         />
         <rect
           x="0"
-          y="352"
+          y={vessel.fillY}
           width="400"
-          height="100"
-          fill={`oklch(0.3 ${chroma * 0.5} ${to} / 0.28)`}
+          height="2.5"
+          fill={`oklch(0.94 ${chroma * 0.5} ${from} / 0.7)`}
+        />
+
+        {/* Specular band down the lit edge. */}
+        <rect
+          x={lit === "left" ? "126" : "244"}
+          y="120"
+          width="30"
+          height="360"
+          rx="15"
+          fill={`url(#shine-${uid})`}
+        />
+        {/* Narrow catch-light on the opposite edge. */}
+        <rect
+          x={lit === "left" ? "268" : "112"}
+          y="200"
+          width="10"
+          height="230"
+          rx="5"
+          fill="oklch(1 0 0 / 0.22)"
         />
       </g>
 
-      {/* Label band */}
-      <path d={vessel.label} fill="oklch(0.98 0.006 85 / 0.92)" />
+      {/* Label panel and printed rules. */}
+      <path d={vessel.label} fill="oklch(0.985 0.005 85 / 0.94)" />
       <rect
-        x={art.vessel === "jar" ? "156" : "170"}
-        y={art.vessel === "jar" ? "292" : "288"}
-        width={art.vessel === "jar" ? "88" : "60"}
-        height="5"
-        rx="2.5"
-        fill={`oklch(0.5 ${chroma} ${to})`}
+        x={vessel.labelX}
+        y="300"
+        width={vessel.labelW}
+        height="7"
+        rx="3.5"
+        fill={`oklch(0.44 ${chroma} ${to})`}
       />
       <rect
-        x={art.vessel === "jar" ? "156" : "170"}
-        y={art.vessel === "jar" ? "306" : "302"}
-        width={art.vessel === "jar" ? "56" : "38"}
-        height="4"
-        rx="2"
-        fill={`oklch(0.68 ${chroma * 0.6} ${to})`}
+        x={vessel.labelX}
+        y="320"
+        width={vessel.labelW * 0.62}
+        height="5"
+        rx="2.5"
+        fill={`oklch(0.64 ${chroma * 0.7} ${to})`}
+      />
+      <rect
+        x={vessel.labelX}
+        y="336"
+        width={vessel.labelW * 0.4}
+        height="5"
+        rx="2.5"
+        fill={`oklch(0.74 ${chroma * 0.45} ${to})`}
+      />
+
+      <rect
+        width="400"
+        height="500"
+        filter={`url(#grain-${uid})`}
+        opacity="0.055"
+        style={{ mixBlendMode: "multiply" }}
       />
     </svg>
   );

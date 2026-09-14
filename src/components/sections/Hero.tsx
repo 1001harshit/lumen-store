@@ -46,15 +46,15 @@ export function Hero({ products }: { products: Product[] }) {
       >
         <div
           className="absolute -left-[18%] top-[-14%] h-[42rem] w-[42rem] rounded-full blur-[110px]"
-          style={{ background: "oklch(0.86 0.07 168 / 0.55)" }}
+          style={{ background: "oklch(0.86 0.07 168 / 0.3)" }}
         />
         <div
           className="absolute -right-[14%] top-[8%] h-[38rem] w-[38rem] rounded-full blur-[120px]"
-          style={{ background: "oklch(0.88 0.06 42 / 0.5)" }}
+          style={{ background: "oklch(0.88 0.06 42 / 0.28)" }}
         />
         <div
           className="absolute bottom-[-20%] left-[28%] h-[34rem] w-[34rem] rounded-full blur-[120px]"
-          style={{ background: "oklch(0.87 0.05 300 / 0.42)" }}
+          style={{ background: "oklch(0.87 0.05 300 / 0.24)" }}
         />
       </motion.div>
 
@@ -64,17 +64,18 @@ export function Hero({ products }: { products: Product[] }) {
         style={reduced ? still : { y: vesselY }}
         className="pointer-events-none absolute inset-0 -z-[5]"
       >
-        {products.slice(0, 3).map((product, i) => {
+        {products.slice(0, 4).map((product, i) => {
           const spots = [
-            "left-[4%] top-[14%] h-44 w-36 md:h-72 md:w-56",
-            "right-[6%] top-[26%] h-40 w-32 md:h-64 md:w-52",
-            "left-[16%] bottom-[8%] h-36 w-28 md:h-56 md:w-44",
+            "left-[-2%] top-[10%] h-56 w-44 md:h-[26rem] md:w-80",
+            "right-[-1%] top-[20%] h-52 w-40 md:h-96 md:w-72",
+            "left-[11%] bottom-[2%] h-44 w-36 md:h-80 md:w-64",
+            "right-[13%] bottom-[-2%] hidden h-40 w-32 md:block md:h-72 md:w-56",
           ];
           return (
             <motion.div
               key={product.id}
-              className={`absolute ${spots[i]} opacity-70 md:opacity-100`}
-              initial={{ opacity: 0, y: 40, rotate: i === 1 ? 6 : -5 }}
+              className={`absolute ${spots[i]} overflow-hidden rounded-[2rem] opacity-80 md:opacity-100`}
+              initial={{ opacity: 0, y: 40, rotate: i % 2 === 1 ? 6 : -5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
                 duration: 1.1,
@@ -150,10 +151,33 @@ export function Hero({ products }: { products: Product[] }) {
         </motion.div>
       </motion.div>
 
+      {/* Proof strip — fills the lower third, which otherwise reads as a gap
+          between the call to action and the fold. */}
+      <motion.dl
+        className="absolute inset-x-0 bottom-20 z-10 hidden justify-center gap-12 md:flex lg:gap-20"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 1.05, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {[
+          { value: "12", label: "Products, total" },
+          { value: "4.7", label: "Average rating" },
+          { value: "7,100+", label: "Verified reviews" },
+          { value: "24h", label: "Dispatch" },
+        ].map((stat) => (
+          <div key={stat.label} className="text-center">
+            <dt className="font-display text-3xl tabular-nums tracking-[-0.03em]">
+              {stat.value}
+            </dt>
+            <dd className="eyebrow mt-1.5">{stat.label}</dd>
+          </div>
+        ))}
+      </motion.dl>
+
       <motion.a
         href="#featured"
         aria-label="Scroll to featured products"
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-content-subtle"
+        className="absolute bottom-7 left-1/2 z-10 -translate-x-1/2 text-content-subtle"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.3, duration: 0.6 }}

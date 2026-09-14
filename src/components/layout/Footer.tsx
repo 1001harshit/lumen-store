@@ -11,7 +11,7 @@ const SUPPORT = [
 
 export function Footer() {
   return (
-    <footer className="mt-32 border-t border-hairline bg-surface-sunken">
+    <footer className="mt-24 border-t border-hairline bg-surface-sunken">
       <div className="shell py-20">
         <div className="grid gap-14 md:grid-cols-[1.4fr_1fr_1fr]">
           <Reveal>

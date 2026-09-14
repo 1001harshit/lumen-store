@@ -53,7 +53,7 @@ export function ReviewMarquee() {
   const [top, bottom] = [REVIEWS.slice(0, 3), REVIEWS.slice(3)];
 
   return (
-    <section id="reviews" className="mt-32 overflow-hidden py-4">
+    <section id="reviews" className="mt-24 overflow-hidden py-4 md:mt-28">
       <div className="shell">
         <Reveal>
           <p className="eyebrow">4.7 average · 7,100+ reviews</p>
