@@ -15,11 +15,21 @@ import { readCartRefs, writeCartRefs } from "@/lib/cart";
 
 export type CartActionResult = { ok: true } | { ok: false; error: string };
 
+// Server actions are callable with any arguments, not just what the UI sends,
+// so a quantity has to be checked to be a whole number before it is used.
+function isWholeQuantity(quantity: unknown): quantity is number {
+  return Number.isInteger(quantity) && (quantity as number) >= 0;
+}
+
 export async function addToCart(
   productId: string,
   variantId: string,
   quantity = 1,
 ): Promise<CartActionResult> {
+  if (!isWholeQuantity(quantity) || quantity < 1) {
+    return { ok: false, error: "Choose a quantity of at least one." };
+  }
+
   const product = await getProductById(productId);
   if (!product) return { ok: false, error: "That product is no longer available." };
 
@@ -51,6 +61,10 @@ export async function updateLineQuantity(
   variantId: string,
   quantity: number,
 ): Promise<CartActionResult> {
+  if (!isWholeQuantity(quantity)) {
+    return { ok: false, error: "Choose a whole number of items." };
+  }
+
   const refs = await readCartRefs();
 
   if (quantity < 1) {
