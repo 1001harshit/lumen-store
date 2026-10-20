@@ -4,16 +4,12 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { resolveCart, writeCartRefs } from "@/lib/cart";
 import { buildOrder, saveOrder } from "@/lib/orders";
+import {
+  validateCheckout,
+  type CheckoutDetails,
+} from "@/lib/checkout-validation";
 
-export type CheckoutDetails = {
-  email: string;
-  phone: string;
-  name: string;
-  address: string;
-  city: string;
-  state: string;
-  pincode: string;
-};
+export type { CheckoutDetails };
 
 export type CheckoutResult = { ok: false; error: string };
 
@@ -28,30 +24,11 @@ export type CheckoutResult = { ok: false; error: string };
  * arriving from a client is a suggestion until the server has priced it.
  */
 export async function placeOrder(
-  details: CheckoutDetails,
+  input: CheckoutDetails,
 ): Promise<CheckoutResult> {
-  const required: (keyof CheckoutDetails)[] = [
-    "email",
-    "name",
-    "address",
-    "city",
-    "state",
-    "pincode",
-  ];
-
-  for (const field of required) {
-    if (!details[field]?.trim()) {
-      return { ok: false, error: "Some delivery details are still missing." };
-    }
-  }
-
-  if (!/^\S+@\S+\.\S+$/.test(details.email)) {
-    return { ok: false, error: "That email address does not look right." };
-  }
-
-  if (!/^\d{6}$/.test(details.pincode)) {
-    return { ok: false, error: "Enter a six-digit PIN code." };
-  }
+  const checked = validateCheckout(input);
+  if (!checked.ok) return checked;
+  const { details } = checked;
 
   const cart = await resolveCart();
   if (cart.lines.length === 0) {
